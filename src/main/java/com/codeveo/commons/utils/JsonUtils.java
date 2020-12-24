@@ -73,7 +73,6 @@ public final class JsonUtils {
      * <li>disabled {@link SerializationFeature#WRITE_DATES_AS_TIMESTAMPS}</li>
      * <li>inclusion {@link Include#NON_ABSENT}</li>
      * <li>inclusion {@link Include#NON_EMPTY}</li>
-     * <li>inclusion {@link Include#NON_NULL}</li>
      * <li>registered module {@link ParameterNamesModule}</li>
      * <li>registered module {@link Jdk8Module}</li>
      * <li>registered module {@link JavaTimeModule}</li>

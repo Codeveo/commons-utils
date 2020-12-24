@@ -25,10 +25,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-public class IoUtils {
+public final class IoUtils {
 
     private IoUtils(){
     }
+
     /**
      * Get file input stream from path. If the path starts with 'classpath:' then the classpath is used.
      *
