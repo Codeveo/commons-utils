@@ -17,6 +17,7 @@ package com.codeveo.commons.utils;
 
 import com.codeveo.commons.utils.exception.CodeveoUtilsException;
 
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -61,6 +62,23 @@ public final class LambdaUtils {
 
 
     @FunctionalInterface
+    public interface BiFunctionThrowable<ParameterT, ParameterU, ResultT, ExceptionT extends Exception>
+            extends BiFunction<ParameterT, ParameterU, ResultT> {
+
+        @Override
+        default ResultT apply(final ParameterT parameter1, final ParameterU parameter2) {
+            try {
+                return applyThrows(parameter1, parameter2);
+            } catch (final Exception exception) {
+                throw new CodeveoUtilsException(exception);
+            }
+        }
+
+        ResultT applyThrows(ParameterT parameter1, ParameterU parameter2) throws ExceptionT;
+    }
+
+
+    @FunctionalInterface
     public interface PredicateThrowable<ParameterT, ExceptionT extends Exception> extends Predicate<ParameterT> {
 
         @Override
@@ -98,6 +116,12 @@ public final class LambdaUtils {
 
     public static <ParameterT, ResultT, ExceptionT extends Exception> Function<ParameterT, ResultT> functionThrowable(
             final FunctionThrowable<ParameterT, ResultT, ExceptionT> function) {
+        return function;
+    }
+
+    public static <ParameterT, ParameterU, ResultT, ExceptionT extends Exception> BiFunction<ParameterT, ParameterU,
+            ResultT> biFunctionThrowable(
+            final BiFunctionThrowable<ParameterT, ParameterU, ResultT, ExceptionT> function) {
         return function;
     }
 

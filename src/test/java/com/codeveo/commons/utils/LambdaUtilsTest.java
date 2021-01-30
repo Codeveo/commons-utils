@@ -18,7 +18,10 @@ package com.codeveo.commons.utils;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.codeveo.commons.utils.LambdaUtils.consumerThrowable;
@@ -32,10 +35,11 @@ class LambdaUtilsTest {
 
     @Test
     void testConsumerThrowable() {
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> Optional.of("test")
-                .ifPresent(consumerThrowable(arg -> {
-                    throw new CheckedTestException(arg);
-                })));
+        Consumer<Integer> consumer = consumerThrowable(arg -> {
+            throw new CheckedTestException("test");
+        });
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> consumer.accept(1));
 
         assertEquals(CheckedTestException.class, thrown.getCause().getClass());
         assertEquals("test", thrown.getCause().getMessage());
@@ -43,11 +47,23 @@ class LambdaUtilsTest {
 
     @Test
     void testFunctionThrowable() {
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> Optional.of("test")
-                .map(functionThrowable(arg -> {
-                    throw new CheckedTestException(arg);
-                }))
-                .orElseThrow(() -> new IllegalStateException("testFailed")));
+        Function<Integer, Integer> function = functionThrowable(arg -> {
+            throw new CheckedTestException("test");
+        });
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> function.apply(1));
+
+        assertEquals(CheckedTestException.class, thrown.getCause().getClass());
+        assertEquals("test", thrown.getCause().getMessage());
+    }
+
+    @Test
+    void testBiFunctionThrowable() {
+        BiFunction<Integer, Integer, Integer> biFunction = LambdaUtils.biFunctionThrowable((x1, x2) -> {
+            throw new CheckedTestException("test");
+        });
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> biFunction.apply(1, 2));
 
         assertEquals(CheckedTestException.class, thrown.getCause().getClass());
         assertEquals("test", thrown.getCause().getMessage());
@@ -55,11 +71,11 @@ class LambdaUtilsTest {
 
     @Test
     void testPredicateThrowable() {
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> Optional.of("test")
-                .filter(predicateThrowable(arg -> {
-                    throw new CheckedTestException(arg);
-                }))
-                .orElseThrow(() -> new IllegalStateException("testFailed")));
+        Predicate<Integer> predicate = predicateThrowable(arg -> {
+            throw new CheckedTestException("test");
+        });
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> predicate.test(1));
 
         assertEquals(CheckedTestException.class, thrown.getCause().getClass());
         assertEquals("test", thrown.getCause().getMessage());
@@ -67,10 +83,11 @@ class LambdaUtilsTest {
 
     @Test
     void testSupplierThrowable() {
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> Optional.empty()
-                .orElseGet(supplierThrowable(() -> {
-                    throw new CheckedTestException("test");
-                })));
+        Supplier<Integer> supplier = supplierThrowable(() -> {
+            throw new CheckedTestException("test");
+        });
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, supplier::get);
 
         assertEquals(CheckedTestException.class, thrown.getCause().getClass());
         assertEquals("test", thrown.getCause().getMessage());
